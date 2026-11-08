@@ -1,3 +1,49 @@
+# CRC: a minimalistic C compiler (C → RISC-V)
+
+CRC is a hobby compiler written in **C** that translates a small subset of the C language into **RISC-V assembly**. The bundled [Venus](https://github.com/kvakil/venus) RISC-V simulator (`venus.jar`) is used to run the generated assembly.
+
+## Supported so far
+
+- `int` variables, assignment and arithmetic expressions (`+ - * /`, parentheses, correct operator priority via postfix / dual-stack evaluation)
+- Logical operators, `if` statements and `while` loops
+- Scopes (`{ ... }`), `/* ... */` comments, `void` functions
+- Pointers and assignment through addresses (partial), a built-in `CRC_PRINT` pseudo-function
+- Token filtering, overflow detection and a bash-based test suite
+
+See the development log below for the full history.
+
+## Layout
+
+```
+Compiler_files/
+├── CRC.c                    # entry point: reads the .c file, writes assembly
+├── filter.c/.h              # token filtering and normalization
+├── Mr_Compilator.c/.h       # core translation logic (scopes, statements, expressions)
+├── instructions.c/.h        # RISC-V instruction generation
+├── Data.c/.h                # operator priorities and shared data
+├── vector.c, strVector.c, varVector.c   # generic / string / variable vectors
+├── Modules_test/            # unit tests for individual modules
+├── Makefile
+└── COMPILE_AND_RUN          # helper script: compile a .c file and run it in Venus
+Input_c_files/               # sample input programs
+venus.jar                    # RISC-V simulator
+```
+
+## Build and run
+
+```bash
+cd Compiler_files
+make                              # builds ./CRC
+./CRC input.c out.s               # compile C source to RISC-V assembly
+java -jar ../venus.jar -ms -1 out.s   # run the assembly in Venus
+```
+
+`COMPILE_AND_RUN` automates the last two steps but contains a hard-coded path to `venus.jar`; edit it to match your checkout. Requires `gcc` and a Java runtime.
+
+---
+
+## Development log (original notes)
+
 This is my personal project. It is a minimalistic C compiler that turns
 C code into RISC-V assembly. Special java executable file is provided,
 which will simulate running the compiled c program. Of course, writing
